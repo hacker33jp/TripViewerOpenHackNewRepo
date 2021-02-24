@@ -66,6 +66,16 @@ stages:
           wait-for-url https://${HOST}
 
     - task: AzureAppServiceManage@0
+      condition: failed()
+      inputs:
+        azureSubscription: 'OTA-PRD-1310(1)(337a5d8e-1cf6-4a6f-bc59-95ea4f64f58b)'
+        Action: 'Stop Azure App Service'
+        WebAppName: 'openhackrm78bnn5userprofile'
+        SpecifySlotOrASE: true
+        ResourceGroupName: 'openhackrm78bnn5rg'
+        Slot: 'staging'
+              
+    - task: AzureAppServiceManage@0
       condition: succeeded()
       inputs:
               azureSubscription: 'OTA-PRD-1310(1)(337a5d8e-1cf6-4a6f-bc59-95ea4f64f58b)'
