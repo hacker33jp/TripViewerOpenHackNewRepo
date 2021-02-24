@@ -37,15 +37,12 @@ stages:
         containerRegistry: $(dockerRegistryServiceConnection)
         tags: |
           $(tag)
-    - task: AzureRmWebAppDeployment@4
+    
+    - task: AzureWebAppContainer@1
       inputs:
-              ConnectionType: 'AzureRM'
-              azureSubscription: 'OTA-PRD-1310(337a5d8e-1cf6-4a6f-bc59-95ea4f64f58b)'
-              appType: 'webAppContainer'
-              WebAppName: 'openhackrm78bnn5userprofile'
-              deployToSlotOrASE: true
-              ResourceGroupName: 'openhackrm78bnn5rg'
-              SlotName: 'production'
-              DockerNamespace: '$(imageRepository)'
-              DockerRepository: '$(imageRepository)'
-              DockerImageTag: '$(Build.BuildId)'
+       azureSubscription: 'OTA-PRD-1310(337a5d8e-1cf6-4a6f-bc59-95ea4f64f58b)'
+       appName: 'openhackrm78bnn5userprofile'
+       deployToSlotOrASE: true
+       resourceGroupName: 'openhackrm78bnn5rg'
+       slotName: 'staging'
+       containers: '$(containerRegistry)/$(imageRepository):$(tag)'
