@@ -53,7 +53,7 @@ stages:
        script: |
          #!/bin/bash
          
-         declare -i duration=10
+         declare -i duration=60
          declare hasUrl=""
          declare endpoint
          declare -i status200count=0
