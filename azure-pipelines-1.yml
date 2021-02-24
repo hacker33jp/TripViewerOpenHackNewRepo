@@ -52,55 +52,15 @@ stages:
         targetType: 'inline'
         script: |
           #!/bin/bash
+          set -eux
+          declare -r HOST="openhackrm78bnn5userprofile-staging.azurewebsites.net/api/healthcheck/user"
           
-          declare -i duration=10
-          declare hasUrl=""
-          declare endpoint
-          declare -i status200count=0
-          
-          endpoint="https://openhackrm78bnn5userprofile-staging.azurewebsites.net/api/healthcheck/user"
-          
-          healthcheck() {
-              declare url=$1
-              result=$(curl -i $url 2>/dev/null | grep HTTP/1.1)
-              echo $result
+          wait-for-url() {
+          echo "POI Checking Deployed Staging Health Status $1"
+          timeout -s TERM 45 bash -c \
+          'while [[ "$(curl -s -o /dev/null -L -w ''%{http_code}'' ${0})" != "200" ]];\
+          do echo "Waiting for ${0}" && sleep 5;\
+          done' ${1}
+          echo "OK!"
           }
-          
-          for i in {1..12}
-          do
-            result=`healthcheck $endpoint` 
-            declare status
-            echo  "result:  " $result
-            if [[ -z $result ]]; then  
-              status="N/A"
-              echo "Site not found"
-            else
-              status=${result:9:3}
-              timestamp=$(date "+%Y%m%d-%H%M%S")
-              if [[ -z $hasUrl ]]; then
-                echo "$timestamp | $status "
-              else
-                echo "$timestamp | $status | $endpoint " 
-              fi 
-              
-              if [ $status -eq 200 ]; then
-                ((status200count=status200count + 1))
-          
-                if [ $status200count -gt 5 ]; then
-                    break
-                fi
-              fi
-          
-              sleep $duration
-            fi
-          done
-          
-          if [ $status200count -gt 5 ]; then
-            echo "API UP"
-            # APISTATUS is a pipeline variable
-            APISTATUS="Up"
-          else
-            echo "API DOWN"
-            APISTATUS="Down"
-            exit 1;
-          fi
+          wait-for-url https://${HOST}
